@@ -1,0 +1,8 @@
+<div class="ezw-card__wrapper">
+	<div class="ezw-card__word">{{wordWithTranslation?.word}}</div>
+
+	<ezw-text-field [(value)]="_userTranslation"
+					(valueChange)="_onTextFieldValueChange($event)"
+					[disabled]="_correct"
+	></ezw-text-field>
+</div>

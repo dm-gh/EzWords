@@ -1,0 +1,10 @@
+<input class="ezw-text-field__input" 
+	   type="text" 
+	   [ngModel]="value"
+	   (ngModelChange)="_valueChange($event)"
+	   (keydown)="_onKeyDown($event)"
+	   [disabled]="disabled"
+>
+<div class="ezw-text-field__underline" 
+     [class._disabled]="disabled"
+></div>

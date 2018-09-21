@@ -1,0 +1,29 @@
+@import "../../assets/styles/mixins.less";
+
+.ezw-text-field {
+	width: 100%;
+
+	&__underline {
+		margin-top: 2px;
+		height: 0;
+		width: 100%;
+		border: thin solid;
+		border-color: #6CD7F8;
+		transition: border-color .2s ease; 
+
+		&._disabled {
+			border-color: #92ffb3;			
+		}
+	}
+
+	&__input {
+		border: none;
+		font-size: 72px;
+		line-height: 72px;
+		width: 100%;
+		outline: none;
+		background: transparent;
+		
+		.font-light;
+	}
+}

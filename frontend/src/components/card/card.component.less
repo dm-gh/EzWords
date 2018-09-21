@@ -1,0 +1,27 @@
+@import "../../assets/styles/mixins.less";
+
+.ezw-card {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&__wrapper {
+		max-width: 500px;
+		max-height: 500px;
+		height: 33%;
+		width: 33%;
+		display: flex;
+		flex-flow: column nowrap;
+		justify-content: space-between;
+	}
+
+	&__word {
+		font-size: 72px;
+		line-height: 72px;
+		text-align: center;
+
+		.font-light;
+	}
+}

@@ -21,3 +21,19 @@ chmod +x backend/start_ezw.sh
 ####Windows
 I don't know, I have paws 
 ###Frontend
+
+1 . Install nodejs
+2 . Install npm
+3 . Install ng
+```bash
+npm i -g ng
+```
+4 . Install dependecies
+```bash
+cd frontend
+npm i
+```
+5 . Start server
+```bash
+npm start
+```

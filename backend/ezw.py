@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -27,9 +28,14 @@ words_list = [
 ]
 
 
-@app.route('/words')
+@app.route('/api/words')
 def get_words():
-  return jsonify(words_list)
+  return jsonify(words_list)\
+
+
+@app.route('/api/config.json')
+def get_config():
+  return jsonify(dict(words='/api/words')) # TODO use config file
 
 
 if __name__ == '__main__':

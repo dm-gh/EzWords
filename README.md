@@ -37,3 +37,8 @@ npm i
 ```bash
 npm start
 ```
+### iOS App
+1. Buy a Mac
+2. Install Xcode 10.*
+3. Open .xcodeproj
+4. Build an app

@@ -6,7 +6,7 @@
 1 . Create virtualenv
 ```bash
 cd backend
-python3 -m venv backend/venv
+python3 -m venv venv
 source venv/bin/activate 
 ```
 2 . Install requirements.txt

@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         
         openDatabase();
         //query();
-        deleteWordFromDB()
+        deleteWordFromDB(word: "'anger'")
         
     }
     
@@ -107,8 +107,8 @@ class ViewController: UIViewController {
         sqlite3_finalize(queryStatement)
     }
     
-    func deleteWordFromDB() {
-        let deleteStatementString = "DELETE FROM Words WHERE Eng_tr = approve;"
+    func deleteWordFromDB(word: String) {
+        let deleteStatementString = "DELETE FROM Words WHERE Eng_tr =" + word + ";"
         var deleteStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
             if sqlite3_step(deleteStatement) == SQLITE_DONE {

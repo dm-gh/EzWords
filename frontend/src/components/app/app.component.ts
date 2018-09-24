@@ -1,13 +1,15 @@
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, ViewEncapsulation, OnInit } from '@angular/core';
+
+import { EzwConfigService } from "../../services/config.service";
 
 @Component({
-  selector: 'app-root',
+  selector: 'ezw-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class AppComponent {
-	@HostBinding("class") private classList = "app-root";
+export class EzwAppComponent implements OnInit {
+	@HostBinding("class") private classList = "ezw-app";
 
   public _wordsWithTranslations = [
   	{word: "apple", translation: "apple1"},
@@ -26,6 +28,13 @@ export class AppComponent {
   ]
 
   public _currentWord: number = 0;
+
+  constructor(private configService: EzwConfigService) {
+  }
+
+  public ngOnInit() {
+    this.configService.fetchConfig();
+  }
 
   public _showNextWord(): void {
   	setTimeout(() => {

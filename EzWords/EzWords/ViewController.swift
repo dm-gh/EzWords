@@ -30,12 +30,18 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureView()
+        
         blueLine.image = UIImage(named:blueLineName)
         
         openDatabase();
         //query();
-        deleteWordFromDB(word: "'anger'")
+        //deleteWordFromDB(word: "'anger'")
         
+    }
+    
+    func configureView(){
+        translationTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
     
     func openDatabase(){
@@ -74,7 +80,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func query() {
+    func query_all() {
         var queryStatement: OpaquePointer? = nil
         // 1
         if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
@@ -108,7 +114,7 @@ class ViewController: UIViewController {
     }
     
     func deleteWordFromDB(word: String) {
-        let deleteStatementString = "DELETE FROM Words WHERE Eng_tr =" + word + ";"
+        let deleteStatementString = "DELETE FROM Words WHERE Eng_tr ='" + word + "';"
         var deleteStatement: OpaquePointer? = nil
         if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
             if sqlite3_step(deleteStatement) == SQLITE_DONE {
@@ -119,8 +125,46 @@ class ViewController: UIViewController {
         } else {
             print("DELETE statement could not be prepared")
         }
-        query()
+        query_all()
         sqlite3_finalize(deleteStatement)
+    }
+    
+    func query() -> String {
+        var queryStatement: OpaquePointer? = nil
+        // 1
+        if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
+            // 2
+            if sqlite3_step(queryStatement) == SQLITE_ROW {
+                
+                // 4
+                let queryResultCol2 = sqlite3_column_text(queryStatement, 1)
+                let Eng_Tr = String(cString: queryResultCol2!)
+                
+                // 5
+                
+                return Eng_Tr
+                
+            } else {
+                print("Query returned no results")
+                insertWordsIntoDB()
+                return "Null"
+            }
+        } else {
+            print("SELECT statement could not be prepared")
+        }
+        
+        // 6
+        sqlite3_finalize(queryStatement)
+        return ""
+        
+    }
+    
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        if textField.text == wordLabel.text{
+            textField.text = ""
+            deleteWordFromDB(word: wordLabel.text!)
+            wordLabel.text = query()
+        }
     }
 
 }

@@ -1,8 +1,8 @@
 # EzWords
 
-##How to run
-###Backend
-####Ubuntu
+## How to run  
+### Backend  
+#### Ubuntu  
 1 . Create virtualenv
 ```bash
 cd backend
@@ -18,9 +18,9 @@ pip install -r requirements.txt
 chmod +x backend/start_ezw.sh
 ./start_ezw.sh
 ```
-####Windows
+#### Windows
 I don't know, I have paws 
-###Frontend
+### Frontend
 
 1 . Install nodejs
 2 . Install npm

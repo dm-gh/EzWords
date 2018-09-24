@@ -4,7 +4,7 @@ import { Observable, Observer } from "rxjs";
 
 @Injectable()
 export class EzwConfigService {
-  private readonly serverLocation = "localhost:5000/";
+  private readonly serverLocation = "http://localhost:5000/";
   private readonly configUrl = "api/config.json";
 
   private _config: any;

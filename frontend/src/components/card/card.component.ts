@@ -1,4 +1,5 @@
-import { Component, Input, EventEmitter, Output, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, Input, EventEmitter, Output, HostBinding, ViewEncapsulation, ViewChild } from '@angular/core';
+import { EzwTextFieldComponent } from "../text-field/text-field.component";
 
 export interface EzwWordWithTranslation {
 	word: string;
@@ -14,6 +15,9 @@ export interface EzwWordWithTranslation {
 export class EzwCardComponent {
 	@HostBinding("class") private classList = "ezw-card";
 
+	@ViewChild("textField")
+  private textField: EzwTextFieldComponent;
+
 	private _wordWithTranslation: EzwWordWithTranslation;
 
 	get wordWithTranslation(): EzwWordWithTranslation {
@@ -26,6 +30,7 @@ export class EzwCardComponent {
 			this._wordWithTranslation = word;
 			this._userTranslation = "";
 			this._correct = false;
+			setTimeout(() => this.textField.input.nativeElement.focus());
 		}
 	}
 

@@ -1,4 +1,13 @@
-import { Component, Input, EventEmitter, Output, HostBinding, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  Input,
+  EventEmitter,
+  Output,
+  HostBinding,
+  ViewEncapsulation,
+  ElementRef,
+  ViewChild
+} from '@angular/core';
 
 @Component({
   selector: 'ezw-text-field',
@@ -8,6 +17,9 @@ import { Component, Input, EventEmitter, Output, HostBinding, ViewEncapsulation 
 })
 export class EzwTextFieldComponent {
 	@HostBinding("class") private classList = "ezw-text-field";
+
+	@ViewChild("input")
+  public input: ElementRef;
 
 	@Input()
 	public value: string;

@@ -1,5 +1,7 @@
 import os
-from flask import Flask, jsonify, request
+import json
+import flask
+from flask import Flask, Response, jsonify, request
 
 app = Flask(__name__)
 
@@ -30,12 +32,19 @@ words_list = [
 
 @app.route('/api/words')
 def get_words():
-  return jsonify(words_list)\
+    resp = jsonify(words_list)
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    resp.headers.add('Content-Type', 'application/json')
+    return resp
 
 
 @app.route('/api/config.json')
 def get_config():
-  return jsonify(dict(words='/api/words')) # TODO use config file
+    data = {'words': 'api/words'}
+    resp = jsonify(data)
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    resp.headers.add('Content-Type', 'application/json')
+    return resp
 
 
 if __name__ == '__main__':

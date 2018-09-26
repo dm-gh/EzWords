@@ -12,6 +12,8 @@ import SQLite3
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var wordLabel1: UILabel!
+    
     @IBOutlet weak var wordLabel: UILabel!
     
     @IBOutlet weak var translationTextField: UITextField!
@@ -19,10 +21,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var blueLine: UIImageView!
     let blueLineName = "blue-line-png.png"
     
+    internal let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+
+    
     var db: OpaquePointer?
     
+    var stmt: OpaquePointer?
+    
     var wordsRus = ["отменять", "зависимость", "сельское хозяйство", "любитель", "посол", "скорая помощь", "злость", "одобрять", "фартук", "организовывать", "высокомерный", "хвастаться", "телохранитель", "столовая"]
-    var wordsEng = ["abolish", "addiction", "agricultule", "amateur", "ambassador", "ambulance", "anger", "approve", "apron", "arrange", "arrogant", "boast", "bodyguard", "canteen"]
+    var wordsEng = ["abolish", "addiction", "agriculture", "amateur", "ambassador", "ambulance", "anger", "approve", "apron", "arrange", "arrogant", "boast", "bodyguard", "canteen"]
     
     let queryStatementString = "SELECT * FROM Words;"
 
@@ -41,6 +48,7 @@ class ViewController: UIViewController {
     }
     
     func configureView(){
+        wordLabel.isHidden = true
         translationTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
     
@@ -60,21 +68,25 @@ class ViewController: UIViewController {
     func insertWordsIntoDB(){
         for i in 0...13{
             print(i)
-            var stmt: OpaquePointer?
             let rusTr = wordsRus[i]
             let engTr = wordsEng[i]
+            if rusTr != engTr {
+                
+                let queryString = "INSERT INTO Words (Rus_tr, Eng_tr) VALUES (?, ?)"
             
-            let queryString = "INSERT INTO Words (Rus_tr, Eng_tr) VALUES (?,?)"
+                if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
+                    let errmsg = String(cString: sqlite3_errmsg(db)!)
+                    print("error preparing insert: \(errmsg)")
+                    return
+                }
+                sqlite3_bind_text(stmt, 1, rusTr, -1, SQLITE_TRANSIENT)
+                sqlite3_bind_text(stmt, 2, engTr, -1, SQLITE_TRANSIENT)
+                if sqlite3_step(stmt) == SQLITE_DONE {
+                    print("successfully inserted row")
+                }
+                
             
-            if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
-                let errmsg = String(cString: sqlite3_errmsg(db)!)
-                print("error preparing insert: \(errmsg)")
-                return
-            }
-            sqlite3_bind_text(stmt, 1, rusTr, -1, nil)
-            sqlite3_bind_text(stmt, 2, engTr, -1, nil)
-            if sqlite3_step(stmt) == SQLITE_DONE {
-                print("successfully inserted row")
+                query_all();
             }
             sqlite3_finalize(stmt)
         }
@@ -159,10 +171,41 @@ class ViewController: UIViewController {
         
     }
     
+    func query1() -> String {
+        var queryStatement: OpaquePointer? = nil
+        // 1
+        if sqlite3_prepare_v2(db, queryStatementString, -1, &queryStatement, nil) == SQLITE_OK {
+            // 2
+            if sqlite3_step(queryStatement) == SQLITE_ROW {
+                
+                // 4
+                let queryResultCol1 = sqlite3_column_text(queryStatement, 0)
+                let Rus_Tr = String(cString: queryResultCol1!)
+                
+                // 5
+                
+                return Rus_Tr
+                
+            } else {
+                print("Query returned no results")
+                insertWordsIntoDB()
+                return "Null"
+            }
+        } else {
+            print("SELECT statement could not be prepared")
+        }
+        
+        // 6
+        sqlite3_finalize(queryStatement)
+        return ""
+        
+    }
+    
     @objc func textFieldDidChange(_ textField: UITextField) {
         if textField.text == wordLabel.text{
             textField.text = ""
             deleteWordFromDB(word: wordLabel.text!)
+            wordLabel1.text = query1()
             wordLabel.text = query()
         }
     }

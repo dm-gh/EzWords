@@ -21,6 +21,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var blueLine: UIImageView!
     let blueLineName = "blue-line-png.png"
     
+    @IBOutlet weak var progressView: UIProgressView!
+    
     internal let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
     
@@ -30,6 +32,16 @@ class ViewController: UIViewController {
     
     var wordsRus = ["отменять", "зависимость", "сельское хозяйство", "любитель", "посол", "скорая помощь", "злость", "одобрять", "фартук", "организовывать", "высокомерный", "хвастаться", "телохранитель", "столовая"]
     var wordsEng = ["abolish", "addiction", "agriculture", "amateur", "ambassador", "ambulance", "anger", "approve", "apron", "arrange", "arrogant", "boast", "bodyguard", "canteen"]
+    
+    var counter:Int = 0 {
+        didSet {
+            let fractionalProgress = Float(counter) / 100.0
+            let animated = counter != 0
+            
+            progressView.setProgress(fractionalProgress, animated: animated)
+        }
+    }
+    
     
     let queryStatementString = "SELECT * FROM Words;"
 
@@ -203,12 +215,19 @@ class ViewController: UIViewController {
     
     @objc func textFieldDidChange(_ textField: UITextField) {
         if textField.text == wordLabel.text{
+            counter += 10
+            progressView.progressTintColor = UIColor.green
             textField.text = ""
             deleteWordFromDB(word: wordLabel.text!)
             wordLabel1.text = query1()
             wordLabel.text = query()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // change 2 to desired number of seconds
+                self.progressView.progressTintColor = UIColor.blue
+            }
         }
     }
+    
+    
 
 }
 

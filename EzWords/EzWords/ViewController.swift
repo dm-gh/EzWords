@@ -6,6 +6,14 @@
 //  Copyright © 2018 rodiv. All rights reserved.
 //
 
+
+// App Logic:
+// at the first app launch the database is empty
+// then a random word from a database of english words pops on the screen
+// after typing its translation into the field the pair
+// word-translation is added to the first database
+
+
 import UIKit
 import SQLite3
 
@@ -32,7 +40,10 @@ class ViewController: UIViewController {
     
     var wordsRus = ["отменять", "зависимость", "сельское хозяйство", "любитель", "посол", "скорая помощь", "злость", "одобрять", "фартук", "организовывать", "высокомерный", "хвастаться", "телохранитель", "столовая"]
     var wordsEng = ["abolish", "addiction", "agriculture", "amateur", "ambassador", "ambulance", "anger", "approve", "apron", "arrange", "arrogant", "boast", "bodyguard", "canteen"]
+    var wordsCn = ["废除","成瘾","农业","业余","大使","救护车","愤怒","批准","围裙","安排","傲慢","吹嘘"," 保镖","食堂"]
     
+    
+    // This is for the line under the words
     var counter:Int = 0 {
         didSet {
             let fractionalProgress = Float(counter) / 100.0
@@ -44,16 +55,15 @@ class ViewController: UIViewController {
     
     
     let queryStatementString = "SELECT * FROM Words;"
-
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
         
-        blueLine.image = UIImage(named:blueLineName)
+        //blueLine.image = UIImage(named:blueLineName)
         
         openDatabase();
+        dropDB();
         //query();
         //deleteWordFromDB(word: "'anger'")
         
@@ -64,6 +74,29 @@ class ViewController: UIViewController {
         translationTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
     
+    @objc func textFieldDidChange(_ textField: UITextField) {
+        /*
+        if textField.text == wordLabel.text{
+            counter += 10
+            progressView.progressTintColor = UIColor.green
+            textField.text = ""
+            deleteWordFromDB(word: wordLabel.text!)
+            wordLabel1.text = query1()
+            wordLabel.text = query()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // change 2 to desired number of seconds
+                self.progressView.progressTintColor = UIColor.blue
+            }
+        }
+ */
+    }
+    
+    
+    
+    
+    
+    //--------------------------------------------------------------
+    //                  Database functions
+    //--------------------------------------------------------------
     func openDatabase(){
         let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
             .appendingPathComponent("WordsDB.sqlite")
@@ -77,6 +110,21 @@ class ViewController: UIViewController {
         }
     }
     
+    func dropDB(){
+        let deleteStatementString = "DROP TABLE Words;"
+        var deleteStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
+            if sqlite3_step(deleteStatement) == SQLITE_DONE {
+                print("Successfully dropped table.")
+            } else {
+                print("Could not drop table.")
+            }
+        } else {
+            print("DELETE statement could not be prepared")
+        }
+        sqlite3_finalize(deleteStatement)
+    }
+    
     func insertWordsIntoDB(){
         for i in 0...13{
             print(i)
@@ -85,7 +133,7 @@ class ViewController: UIViewController {
             if rusTr != engTr {
                 
                 let queryString = "INSERT INTO Words (Rus_tr, Eng_tr) VALUES (?, ?)"
-            
+                
                 if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
                     let errmsg = String(cString: sqlite3_errmsg(db)!)
                     print("error preparing insert: \(errmsg)")
@@ -97,7 +145,7 @@ class ViewController: UIViewController {
                     print("successfully inserted row")
                 }
                 
-            
+                
                 query_all();
             }
             sqlite3_finalize(stmt)
@@ -212,21 +260,6 @@ class ViewController: UIViewController {
         return ""
         
     }
-    
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        if textField.text == wordLabel.text{
-            counter += 10
-            progressView.progressTintColor = UIColor.green
-            textField.text = ""
-            deleteWordFromDB(word: wordLabel.text!)
-            wordLabel1.text = query1()
-            wordLabel.text = query()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // change 2 to desired number of seconds
-                self.progressView.progressTintColor = UIColor.blue
-            }
-        }
-    }
-    
     
 
 }

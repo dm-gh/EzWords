@@ -65,6 +65,27 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var learningLabel: UILabel!
     
+    @IBOutlet weak var passButton: UIButton!
+    
+    @IBOutlet weak var nextButton: UIButton!
+    
+    @IBAction func passButtonPressed(_ sender: Any) {
+        if switchMode.isOn{
+            wordLabel1.text = wordsRand.removeFirst()
+        }
+    }
+    @IBAction func nextButtonPressed(_ sender: Any) {
+        if switchMode.isOn{
+            insertWordIntoDB(wordLang: translationTextField.text!, wordEng: wordLabel1.text!)
+            wordLabel1.text = wordsRand.removeFirst()
+            translationTextField.text = ""
+        }
+    }
+    
+    
+    
+    
+    
     internal let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
     
@@ -99,7 +120,6 @@ class ViewController: UIViewController {
         //blueLine.image = UIImage(named:blueLineName)
         
         openDatabase();
-        dropDB();
         opentxt();
         //query();
         //deleteWordFromDB(word: "'anger'")
@@ -108,7 +128,18 @@ class ViewController: UIViewController {
     
     func configureView(){
         wordLabel.isHidden = true
-        translationTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+        passButton.layer.cornerRadius = 8
+        nextButton.layer.cornerRadius = 8
+        
+        if switchMode.isOn{
+            passButton.isHidden = false
+            nextButton.isHidden = false
+        } else {
+            passButton.isHidden = false
+            nextButton.isHidden = true
+            translationTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+            
+        }
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
@@ -141,7 +172,7 @@ class ViewController: UIViewController {
         if sqlite3_open(fileURL.path, &db) == SQLITE_OK {
             print("Database opened")
         }
-        if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS Words (Rus_tr TEXT, Eng_tr TEXT)", nil, nil, nil) != SQLITE_OK {
+        if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS Words (Lang_tr TEXT, Eng_tr TEXT)", nil, nil, nil) != SQLITE_OK {
             let errmsg = String(cString: sqlite3_errmsg(db)!)
             print("error creating table: \(errmsg)")
         }
@@ -187,6 +218,22 @@ class ViewController: UIViewController {
             }
             sqlite3_finalize(stmt)
         }
+    }
+    
+    func insertWordIntoDB(wordLang: String, wordEng: String){
+        let queryString = "INSERT INTO Words (Lang_tr, Eng_tr) VALUES (?, ?)"
+        if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
+            let errmsg = String(cString: sqlite3_errmsg(db)!)
+            print("error preparing insert: \(errmsg)")
+            return
+        }
+        sqlite3_bind_text(stmt, 1, wordLang, -1, SQLITE_TRANSIENT)
+        sqlite3_bind_text(stmt, 2, wordEng, -1, SQLITE_TRANSIENT)
+        if sqlite3_step(stmt) == SQLITE_DONE {
+            print("successfully inserted row")
+        }
+        
+        sqlite3_finalize(stmt)
     }
     
     func query_all() {

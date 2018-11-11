@@ -69,9 +69,17 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var nextButton: UIButton!
     
+    @IBAction func switchValueChanged(_ sender: Any) {
+        configureView()
+    }
     @IBAction func passButtonPressed(_ sender: Any) {
         if switchMode.isOn{
             wordLabel1.text = wordsRand.removeFirst()
+        } else {
+            translationTextField.text = wordLabel.text
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // change 2 to desired number of seconds
+                self.translationTextField.text = ""
+            }
         }
     }
     @IBAction func nextButtonPressed(_ sender: Any) {
@@ -107,6 +115,9 @@ class ViewController: UIViewController {
             let animated = counter != 0
             
             progressView.setProgress(fractionalProgress, animated: animated)
+            if fractionalProgress >= 1{
+                counter = 0
+            }
         }
     }
     
@@ -115,13 +126,13 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        openDatabase()
+        opentxt()
         configureView()
         
         //blueLine.image = UIImage(named:blueLineName)
-        
-        openDatabase();
-        opentxt();
-        //query();
+        //dropDB()
         //deleteWordFromDB(word: "'anger'")
         
     }
@@ -134,11 +145,12 @@ class ViewController: UIViewController {
         if switchMode.isOn{
             passButton.isHidden = false
             nextButton.isHidden = false
+            wordLabel1.text = wordsRand.removeFirst()
         } else {
             passButton.isHidden = false
             nextButton.isHidden = true
             translationTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-            
+            getWordFromDB()
         }
     }
     
@@ -156,6 +168,18 @@ class ViewController: UIViewController {
             }
         }
  */
+        if !switchMode.isOn{
+            if textField.text == wordLabel.text{
+                counter += 10
+                progressView.progressTintColor = UIColor.green
+                textField.text = ""
+                deleteWordFromDB(word: wordLabel.text!)
+                getWordFromDB()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // change 2 to desired number of seconds
+                    self.progressView.progressTintColor = UIColor.blue
+                }
+            }
+        }
     }
     
     
@@ -193,33 +217,6 @@ class ViewController: UIViewController {
         sqlite3_finalize(deleteStatement)
     }
     
-    func insertWordsIntoDB(){
-        for i in 0...13{
-            print(i)
-            let rusTr = wordsRus[i]
-            let engTr = wordsEng[i]
-            if rusTr != engTr {
-                
-                let queryString = "INSERT INTO Words (Rus_tr, Eng_tr) VALUES (?, ?)"
-                
-                if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
-                    let errmsg = String(cString: sqlite3_errmsg(db)!)
-                    print("error preparing insert: \(errmsg)")
-                    return
-                }
-                sqlite3_bind_text(stmt, 1, rusTr, -1, SQLITE_TRANSIENT)
-                sqlite3_bind_text(stmt, 2, engTr, -1, SQLITE_TRANSIENT)
-                if sqlite3_step(stmt) == SQLITE_DONE {
-                    print("successfully inserted row")
-                }
-                
-                
-                query_all();
-            }
-            sqlite3_finalize(stmt)
-        }
-    }
-    
     func insertWordIntoDB(wordLang: String, wordEng: String){
         let queryString = "INSERT INTO Words (Lang_tr, Eng_tr) VALUES (?, ?)"
         if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
@@ -236,6 +233,42 @@ class ViewController: UIViewController {
         sqlite3_finalize(stmt)
     }
     
+    func getWordFromDB(){
+        let getStatementString = "SELECT * FROM Words ORDER BY ROWID ASC LIMIT 1"
+        var getStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, getStatementString, -1, &getStatement, nil) == SQLITE_OK {
+            if sqlite3_step(getStatement) == SQLITE_ROW {
+                let queryResultCol1 = sqlite3_column_text(getStatement, 0)
+                let queryResultCol2 = sqlite3_column_text(getStatement, 1)
+                let Lang_Tr = String(cString: queryResultCol1!)
+                let Eng_Tr = String(cString: queryResultCol2!)
+                wordLabel.text = Eng_Tr
+                wordLabel1.text = Lang_Tr
+                print(Lang_Tr)
+            } else {
+                print("Get statement could not be prepared")
+                switchMode.isOn = true
+                configureView()
+            }
+        }
+    }
+    
+    func deleteWordFromDB(word: String) {
+        let deleteStatementString = "DELETE FROM Words WHERE Eng_tr ='" + word + "';"
+        var deleteStatement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
+            if sqlite3_step(deleteStatement) == SQLITE_DONE {
+                print("Successfully deleted row.")
+            } else {
+                print("Could not delete row.")
+            }
+        } else {
+            print("DELETE statement could not be prepared")
+        }
+        //query_all()
+        sqlite3_finalize(deleteStatement)
+    }
+    /*
     func query_all() {
         var queryStatement: OpaquePointer? = nil
         // 1
@@ -267,22 +300,6 @@ class ViewController: UIViewController {
         
         // 6
         sqlite3_finalize(queryStatement)
-    }
-    
-    func deleteWordFromDB(word: String) {
-        let deleteStatementString = "DELETE FROM Words WHERE Eng_tr ='" + word + "';"
-        var deleteStatement: OpaquePointer? = nil
-        if sqlite3_prepare_v2(db, deleteStatementString, -1, &deleteStatement, nil) == SQLITE_OK {
-            if sqlite3_step(deleteStatement) == SQLITE_DONE {
-                print("Successfully deleted row.")
-            } else {
-                print("Could not delete row.")
-            }
-        } else {
-            print("DELETE statement could not be prepared")
-        }
-        query_all()
-        sqlite3_finalize(deleteStatement)
     }
     
     func query() -> String {
@@ -344,6 +361,36 @@ class ViewController: UIViewController {
         return ""
         
     }
+ 
+    func insertWordsIntoDB(){
+        for i in 0...13{
+            print(i)
+            let rusTr = wordsRus[i]
+            let engTr = wordsEng[i]
+            if rusTr != engTr {
+                
+                let queryString = "INSERT INTO Words (Rus_tr, Eng_tr) VALUES (?, ?)"
+                
+                if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
+                    let errmsg = String(cString: sqlite3_errmsg(db)!)
+                    print("error preparing insert: \(errmsg)")
+                    return
+                }
+                sqlite3_bind_text(stmt, 1, rusTr, -1, SQLITE_TRANSIENT)
+                sqlite3_bind_text(stmt, 2, engTr, -1, SQLITE_TRANSIENT)
+                if sqlite3_step(stmt) == SQLITE_DONE {
+                    print("successfully inserted row")
+                }
+                
+                
+                query_all();
+            }
+            sqlite3_finalize(stmt)
+        }
+    }
+    */
+   
+    
     
     
     
@@ -355,7 +402,7 @@ class ViewController: UIViewController {
             readStringProject = try String(contentsOfFile: fileURL!, encoding: String.Encoding.utf16)
             
         } catch let error as NSError {
-            print("Failed reading from URL: \(fileURL), Error: " + error.localizedDescription)
+            print("Failed reading from URL: \(fileURL ?? ""), Error: " + error.localizedDescription)
         }
         let mas = readStringProject.components(separatedBy: ["\r", "\n"])
         for elem in mas{
@@ -367,7 +414,7 @@ class ViewController: UIViewController {
                     char = elem[i]
                 }
                 
-                wordsRand.insert(elem[0..<i])
+                wordsRand.insert(elem[0..<i].lowercased())
             }
         }
         wordLabel1.text = wordsRand.removeFirst()

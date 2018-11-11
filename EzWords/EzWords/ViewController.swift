@@ -18,6 +18,34 @@ import UIKit
 import SQLite3
 
 
+extension String {
+    
+    var length: Int {
+        return count
+    }
+    
+    subscript (i: Int) -> String {
+        return self[i ..< i + 1]
+    }
+    
+    func substring(fromIndex: Int) -> String {
+        return self[min(fromIndex, length) ..< length]
+    }
+    
+    func substring(toIndex: Int) -> String {
+        return self[0 ..< max(0, toIndex)]
+    }
+    
+    subscript (r: Range<Int>) -> String {
+        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+                                            upper: min(length, max(0, r.upperBound))))
+        let start = index(startIndex, offsetBy: range.lowerBound)
+        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+        return String(self[start ..< end])
+    }
+    
+}
+
 class ViewController: UIViewController {
     
     @IBOutlet weak var wordLabel1: UILabel!
@@ -31,6 +59,12 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var progressView: UIProgressView!
     
+    @IBOutlet weak var switchMode: UISwitch!
+    
+    @IBOutlet weak var trainingLabel: UILabel!
+    
+    @IBOutlet weak var learningLabel: UILabel!
+    
     internal let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
     
@@ -41,6 +75,8 @@ class ViewController: UIViewController {
     var wordsRus = ["отменять", "зависимость", "сельское хозяйство", "любитель", "посол", "скорая помощь", "злость", "одобрять", "фартук", "организовывать", "высокомерный", "хвастаться", "телохранитель", "столовая"]
     var wordsEng = ["abolish", "addiction", "agriculture", "amateur", "ambassador", "ambulance", "anger", "approve", "apron", "arrange", "arrogant", "boast", "bodyguard", "canteen"]
     var wordsCn = ["废除","成瘾","农业","业余","大使","救护车","愤怒","批准","围裙","安排","傲慢","吹嘘"," 保镖","食堂"]
+    
+    var wordsRand = Set<String>()
     
     
     // This is for the line under the words
@@ -64,6 +100,7 @@ class ViewController: UIViewController {
         
         openDatabase();
         dropDB();
+        opentxt();
         //query();
         //deleteWordFromDB(word: "'anger'")
         
@@ -259,6 +296,34 @@ class ViewController: UIViewController {
         sqlite3_finalize(queryStatement)
         return ""
         
+    }
+    
+    
+    
+    func opentxt(){
+        let fileURL = Bundle.main.path(forResource: "words", ofType: "txt")
+        // Read from the file
+        var readStringProject = ""
+        do {
+            readStringProject = try String(contentsOfFile: fileURL!, encoding: String.Encoding.utf16)
+            
+        } catch let error as NSError {
+            print("Failed reading from URL: \(fileURL), Error: " + error.localizedDescription)
+        }
+        let mas = readStringProject.components(separatedBy: ["\r", "\n"])
+        for elem in mas{
+            if (elem != ""){
+                var i = 0
+                var char = elem[0]
+                while (i != elem.count && char != " "){
+                    i+=1
+                    char = elem[i]
+                }
+                
+                wordsRand.insert(elem[0..<i])
+            }
+        }
+        wordLabel1.text = wordsRand.removeFirst()
     }
     
 

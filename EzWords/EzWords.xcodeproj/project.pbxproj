@@ -11,12 +11,12 @@
 		897001692158E95000BFA848 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 897001682158E95000BFA848 /* ViewController.swift */; };
 		8970016C2158E95000BFA848 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8970016A2158E95000BFA848 /* Main.storyboard */; };
 		8970016E2158E95300BFA848 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8970016D2158E95300BFA848 /* Assets.xcassets */; };
-		897001712158E95300BFA848 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8970016F2158E95300BFA848 /* LaunchScreen.storyboard */; };
 		8970017C2158E95300BFA848 /* EzWordsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8970017B2158E95300BFA848 /* EzWordsTests.swift */; };
 		897001872158E95400BFA848 /* EzWordsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 897001862158E95400BFA848 /* EzWordsUITests.swift */; };
 		897001972158F37100BFA848 /* blue-line-png.png in Resources */ = {isa = PBXBuildFile; fileRef = 897001962158F37100BFA848 /* blue-line-png.png */; };
 		89712E192197A52C00C15EC2 /* a.txt in Resources */ = {isa = PBXBuildFile; fileRef = 89712E182197A52C00C15EC2 /* a.txt */; };
 		89712E1B2198211800C15EC2 /* words.txt in Resources */ = {isa = PBXBuildFile; fileRef = 89712E1A2198211800C15EC2 /* words.txt */; };
+		89F3B02E2199E19C006F6AAA /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 89F3B02D2199E19C006F6AAA /* background.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,7 +42,6 @@
 		897001682158E95000BFA848 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		8970016B2158E95000BFA848 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8970016D2158E95300BFA848 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		897001702158E95300BFA848 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		897001722158E95300BFA848 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		897001772158E95300BFA848 /* EzWordsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EzWordsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8970017B2158E95300BFA848 /* EzWordsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EzWordsTests.swift; sourceTree = "<group>"; };
@@ -53,6 +52,7 @@
 		897001962158F37100BFA848 /* blue-line-png.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blue-line-png.png"; sourceTree = "<group>"; };
 		89712E182197A52C00C15EC2 /* a.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = a.txt; path = Resources/a.txt; sourceTree = "<group>"; };
 		89712E1A2198211800C15EC2 /* words.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = words.txt; path = Resources/words.txt; sourceTree = "<group>"; };
+		89F3B02D2199E19C006F6AAA /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = background.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +103,7 @@
 		897001652158E94F00BFA848 /* EzWords */ = {
 			isa = PBXGroup;
 			children = (
+				89F3B02D2199E19C006F6AAA /* background.jpg */,
 				89712E1A2198211800C15EC2 /* words.txt */,
 				89712E182197A52C00C15EC2 /* a.txt */,
 				897001962158F37100BFA848 /* blue-line-png.png */,
@@ -110,7 +111,6 @@
 				897001682158E95000BFA848 /* ViewController.swift */,
 				8970016A2158E95000BFA848 /* Main.storyboard */,
 				8970016D2158E95300BFA848 /* Assets.xcassets */,
-				8970016F2158E95300BFA848 /* LaunchScreen.storyboard */,
 				897001722158E95300BFA848 /* Info.plist */,
 			);
 			path = EzWords;
@@ -239,9 +239,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				89712E192197A52C00C15EC2 /* a.txt in Resources */,
-				897001712158E95300BFA848 /* LaunchScreen.storyboard in Resources */,
 				8970016E2158E95300BFA848 /* Assets.xcassets in Resources */,
 				8970016C2158E95000BFA848 /* Main.storyboard in Resources */,
+				89F3B02E2199E19C006F6AAA /* background.jpg in Resources */,
 				89712E1B2198211800C15EC2 /* words.txt in Resources */,
 				897001972158F37100BFA848 /* blue-line-png.png in Resources */,
 			);
@@ -311,14 +311,6 @@
 				8970016B2158E95000BFA848 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		8970016F2158E95300BFA848 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				897001702158E95300BFA848 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

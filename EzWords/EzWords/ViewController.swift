@@ -47,10 +47,16 @@ extension String {
 }
 
 class ViewController: UIViewController {
+    // comment
+    
+    
+    @IBOutlet weak var modeControl: UISegmentedControl!
     
     @IBOutlet weak var wordLabel1: UILabel!
     
     @IBOutlet weak var wordLabel: UILabel!
+    
+    @IBOutlet weak var infoButton: UILabel!
     
     @IBOutlet weak var translationTextField: UITextField!
     
@@ -61,10 +67,6 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var switchMode: UISwitch!
     
-    @IBOutlet weak var trainingLabel: UILabel!
-    
-    @IBOutlet weak var learningLabel: UILabel!
-    
     @IBOutlet weak var passButton: UIButton!
     
     @IBOutlet weak var nextButton: UIButton!
@@ -73,7 +75,7 @@ class ViewController: UIViewController {
         configureView()
     }
     @IBAction func passButtonPressed(_ sender: Any) {
-        if switchMode.isOn{
+        if modeControl.selectedSegmentIndex == 1{
             wordLabel1.text = wordsRand.removeFirst()
         } else {
             translationTextField.text = wordLabel.text
@@ -83,15 +85,38 @@ class ViewController: UIViewController {
         }
     }
     @IBAction func nextButtonPressed(_ sender: Any) {
-        if switchMode.isOn{
-            insertWordIntoDB(wordLang: translationTextField.text!, wordEng: wordLabel1.text!)
-            wordLabel1.text = wordsRand.removeFirst()
-            translationTextField.text = ""
+        if modeControl.selectedSegmentIndex == 1{
+            if translationTextField.text != "" {
+                let elem = translationTextField.text!
+                var i = elem.count - 1
+                var char = elem[i]
+                while (char == " "){
+                    i-=1
+                    char = elem[i]
+                }
+                if elem[0..<i+1] != ""{
+                    insertWordIntoDB(wordLang: elem[0..<i+1], wordEng: wordLabel1.text!)
+                    wordLabel1.text = wordsRand.removeFirst()
+                    translationTextField.text = ""
+                }
+            }
         }
     }
     
     
     
+    @IBAction func modeChanged(_ sender: Any) {
+        /*switch modeControl.selectedSegmentIndex
+        {
+        case 0:
+            switchMode.isOn = false
+        case 1:
+            switchMode.isOn = true
+        default:
+            break
+        }*/
+        configureView()
+    }
     
     
     internal let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
@@ -130,19 +155,20 @@ class ViewController: UIViewController {
         openDatabase()
         opentxt()
         configureView()
+        //dropDB()
         
         //blueLine.image = UIImage(named:blueLineName)
-        //dropDB()
-        //deleteWordFromDB(word: "'anger'")
+        
         
     }
     
     func configureView(){
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "background.jpg")!)
         wordLabel.isHidden = true
         passButton.layer.cornerRadius = 8
         nextButton.layer.cornerRadius = 8
         
-        if switchMode.isOn{
+        if modeControl.selectedSegmentIndex == 1{
             passButton.isHidden = false
             nextButton.isHidden = false
             wordLabel1.text = wordsRand.removeFirst()
@@ -155,20 +181,7 @@ class ViewController: UIViewController {
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
-        /*
-        if textField.text == wordLabel.text{
-            counter += 10
-            progressView.progressTintColor = UIColor.green
-            textField.text = ""
-            deleteWordFromDB(word: wordLabel.text!)
-            wordLabel1.text = query1()
-            wordLabel.text = query()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // change 2 to desired number of seconds
-                self.progressView.progressTintColor = UIColor.blue
-            }
-        }
- */
-        if !switchMode.isOn{
+        if modeControl.selectedSegmentIndex == 0{
             if textField.text == wordLabel.text{
                 counter += 10
                 progressView.progressTintColor = UIColor.green
@@ -247,7 +260,7 @@ class ViewController: UIViewController {
                 print(Lang_Tr)
             } else {
                 print("Get statement could not be prepared")
-                switchMode.isOn = true
+                modeControl.selectedSegmentIndex = 1
                 configureView()
             }
         }
@@ -361,35 +374,7 @@ class ViewController: UIViewController {
         return ""
         
     }
- 
-    func insertWordsIntoDB(){
-        for i in 0...13{
-            print(i)
-            let rusTr = wordsRus[i]
-            let engTr = wordsEng[i]
-            if rusTr != engTr {
-                
-                let queryString = "INSERT INTO Words (Rus_tr, Eng_tr) VALUES (?, ?)"
-                
-                if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
-                    let errmsg = String(cString: sqlite3_errmsg(db)!)
-                    print("error preparing insert: \(errmsg)")
-                    return
-                }
-                sqlite3_bind_text(stmt, 1, rusTr, -1, SQLITE_TRANSIENT)
-                sqlite3_bind_text(stmt, 2, engTr, -1, SQLITE_TRANSIENT)
-                if sqlite3_step(stmt) == SQLITE_DONE {
-                    print("successfully inserted row")
-                }
-                
-                
-                query_all();
-            }
-            sqlite3_finalize(stmt)
-        }
-    }
-    */
-   
+ */
     
     
     
